@@ -1,6 +1,7 @@
 package com.HarmonyTracker.Entities;
 
 
+import com.HarmonyTracker.Entities.Enums.AuthType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,13 +23,13 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue
     private long id;
+    @Column(unique = true)
+    private String oauthId;
+    @Enumerated(EnumType.STRING)
+    private AuthType authType;
     private String firstname;
     private String lastname;
     private String email;
-    @Column(unique=true)
-    private String facebookId;
-    @Column(unique = true)
-    private String appleId;
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
     private String password;

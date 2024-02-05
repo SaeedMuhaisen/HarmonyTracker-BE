@@ -1,9 +1,9 @@
 package com.HarmonyTracker.CSR.Controllers;
 
-
 import com.HarmonyTracker.CSR.Repositories.TokenRepository;
 import com.HarmonyTracker.CSR.Repositories.UserRepository;
 import com.HarmonyTracker.CSR.Services.JwtService;
+import com.HarmonyTracker.Entities.Enums.AuthType;
 import com.HarmonyTracker.Entities.Enums.TokenType;
 import com.HarmonyTracker.Entities.Token;
 import com.HarmonyTracker.Entities.User;
@@ -35,14 +35,14 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.text.ParseException;
 import java.time.Instant;
 import java.util.Collections;
 
 @Controller
 @RequestMapping("/api/register")
 @RequiredArgsConstructor
-public class Register {
+public class AuthenticationController {
+
     @Value("${Google-Client-Id}")
     private String clientId;
     @Value("${fb-app-id}")
@@ -66,7 +66,7 @@ public class Register {
     private final JwtService jwtService;
     private final TokenRepository tokenRepository;
     @PostMapping("/1")
-    public ResponseEntity<?> register(@RequestBody String token) throws ParseException, GeneralSecurityException, IOException {
+    public ResponseEntity<?> googleAuthentication(@RequestBody String token) throws GeneralSecurityException, IOException {
         GoogleIdTokenVerifier verifier =
                 new GoogleIdTokenVerifier
                         .Builder(new NetHttpTransport(), new GsonFactory())
@@ -94,6 +94,8 @@ public class Register {
                     .firstname(givenName)
                     .lastname(familyName)
                     .email(email)
+                    .oauthId(payload.getSubject())
+                    .authType(AuthType.Google)
                     .build();
             var savedUser= userRepository.save(user);
             var jwtToken = jwtService.generateToken(user);
@@ -118,7 +120,7 @@ public class Register {
         tokenRepository.save(token);
     }
     @PostMapping("/2")
-    public ResponseEntity<?> registerFB(@RequestBody FBAccessTokenJSON fbAccessTokenJSON) {
+    public ResponseEntity<?> facebookAuthentication(@RequestBody FBAccessTokenJSON fbAccessTokenJSON) {
         FacebookValidationModel response;
         try {
             response = webClient.get()
@@ -147,7 +149,7 @@ public class Register {
             else {
                 //check first do we have such user in our database?
                 User user;
-                var userExists = userRepository.findByFacebookId(response.getData().getUserId());
+                var userExists = userRepository.findByOauthId(response.getData().getUserId());
                 if (!userExists.isPresent()) {
                     // Call the graph and collect basic information about the user:
                     FacebookUserModel facebookUserModel = webClient.get()
@@ -160,7 +162,8 @@ public class Register {
 
                     var userToSave = User
                             .builder()
-                            .facebookId(response.getData().getUserId())
+                            .oauthId(response.getData().getUserId())
+                            .authType(AuthType.Facebook)
                             .firstname(facebookUserModel.getFirstName())
                             .lastname(facebookUserModel.getLastName())
                             .email(facebookUserModel.getEmail() != null ? facebookUserModel.getEmail() : "NULL")
@@ -194,7 +197,7 @@ public class Register {
 
     }
     @PostMapping("/3")
-    public ResponseEntity<?> registerApple(@RequestBody AppleCredentialsToken credentialsToken) throws Exception {
+    public ResponseEntity<?> appleAuthentication(@RequestBody AppleCredentialsToken credentialsToken) throws Exception {
         try{
             var result= appleLoginUtil.appleAuth(credentialsToken.getAuthorizationCode());
 //todo: email verified? should this always be true?
@@ -210,13 +213,14 @@ public class Register {
             else {
                 //check first do we have such user in our database?
                 User user;
-                var userExists = userRepository.findByAppleId(result.getSub());
+                var userExists = userRepository.findByOauthId(result.getSub());
                 if (!userExists.isPresent()) {
                     // Call the graph and collect basic information about the user:
 
                     var userToSave = User
                             .builder()
-                            .appleId(result.getSub())
+                            .oauthId(result.getSub())
+                            .authType(AuthType.Apple)
                             .firstname(credentialsToken.getFullName().getGivenName())
                             .lastname(credentialsToken.getFullName().getFamilyName())
                             .email(result.getEmail())
@@ -240,19 +244,16 @@ public class Register {
             System.out.println(e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("failed to validate token");
         }
-
-
     }
-
     private final PasswordEncoder passwordEncoder;
     @PostMapping("/email")
-    public ResponseEntity<AuthenticationResponse> emailReg(@RequestBody RegisterRequest request){
+    public ResponseEntity<AuthenticationResponse> emailRegistration(@RequestBody RegisterRequest request){
 
         var user = User.builder()
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
                 .email(request.getEmail())
-
+                .authType(AuthType.Email)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
         var savedUser = userRepository.save(user);
@@ -266,7 +267,7 @@ public class Register {
     }
     private final AuthenticationManager authenticationManager;
     @PostMapping("/emailLogin")
-    public ResponseEntity<AuthenticationResponse> emailReg(@RequestBody AuthenticationRequest request){
+    public ResponseEntity<AuthenticationResponse> emailAuthentication(@RequestBody AuthenticationRequest request){
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
