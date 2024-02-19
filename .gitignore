@@ -4,6 +4,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 env.properties
+AuthKey_Z3XCBR246A.p8
 ### STS ###
 .apt_generated
 .classpath

@@ -12,6 +12,7 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -98,7 +99,7 @@ public class AppleLoginUtil {
 
             return idTokenPayload;
         } catch (Exception e) {
-            throw e;
+            throw new DataIntegrityViolationException(e.toString());
 
         }
     }
