@@ -16,6 +16,6 @@ public class AuthenticationResponse {
     private String accessToken;
     @JsonProperty("refresh_token")
     private String refreshToken;
-    @JsonProperty("setup_finished")
-    private boolean setupFinished;
+    @JsonProperty("initialized")
+    private boolean initialized;
 }

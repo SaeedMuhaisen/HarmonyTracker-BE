@@ -4,6 +4,7 @@ import com.HarmonyTracker.CSR.Repositories.TokenRepository;
 import com.HarmonyTracker.CSR.Repositories.UserRepository;
 import com.HarmonyTracker.CSR.Services.AuthenticationServices;
 import com.HarmonyTracker.CSR.Services.JwtService;
+import com.HarmonyTracker.CSR.Services.PreviewServices;
 import com.HarmonyTracker.Entities.Enums.AuthType;
 import com.HarmonyTracker.Entities.Enums.TokenType;
 import com.HarmonyTracker.Entities.Token;
@@ -15,6 +16,8 @@ import com.HarmonyTracker.Models.Authentication.RegisterRequest;
 import com.HarmonyTracker.Models.Facebook.FBAccessTokenJSON;
 import com.HarmonyTracker.Models.Facebook.FacebookUserModel;
 import com.HarmonyTracker.Models.Facebook.FacebookValidationModel;
+import com.HarmonyTracker.Models.Preview.BodyDetails;
+import com.HarmonyTracker.Models.Preview.BodyDetailsDTO;
 import com.HarmonyTracker.Utils.AppleLoginUtil;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -47,8 +50,6 @@ import java.util.NoSuchElementException;
 @RequestMapping("/api/register")
 @RequiredArgsConstructor
 public class AuthenticationController {
-
-    private final TokenRepository tokenRepository;
     private final AuthenticationServices authenticationServices;
 
     @PostMapping("/1")
@@ -56,10 +57,10 @@ public class AuthenticationController {
         try{
             var response=authenticationServices.googleAuthentication(token);
             return ResponseEntity.ok(response);
-        }catch (InternalError e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }catch (AuthenticationException e) {
+        } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
     }

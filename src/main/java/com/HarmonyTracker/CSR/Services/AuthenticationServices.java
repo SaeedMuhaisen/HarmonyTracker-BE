@@ -30,6 +30,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -42,6 +43,7 @@ import java.util.Collections;
 import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
+@Component
 public class AuthenticationServices {
 
     @Value("${Google-Client-Id}")
@@ -66,43 +68,30 @@ public class AuthenticationServices {
     private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    public AuthenticationResponse googleAuthentication(String token) throws InternalError,AuthenticationException {
-        GoogleIdToken idToken;
+    public AuthenticationResponse googleAuthentication(@RequestBody String token) throws InternalError, AuthenticationException, GeneralSecurityException, IOException {
+
         GoogleIdTokenVerifier verifier =
                 new GoogleIdTokenVerifier
                         .Builder(new NetHttpTransport(), new GsonFactory())
                         .setAudience(Collections.singletonList(clientId))
                         .build();
-        try{
-            idToken = verifier.verify(token);
-        }catch (Exception e){
-            throw new InternalError("id Token couldn't get verified");
-        }
+
+           GoogleIdToken idToken = verifier.verify(token);
 
         if (idToken != null) {
             GoogleIdToken.Payload payload = idToken.getPayload();
 
-            // Print user identifier
-            String userId = payload.getSubject();
-            System.out.println("User ID: " + userId);
+            User user;
+            var userExists = userRepository.findByOauthId(payload.getSubject());
 
-            // Get profile information from payload
-
-            String email = payload.getEmail();
-            boolean emailVerified = Boolean.valueOf(payload.getEmailVerified());
-            String name = (String) payload.get("name");
-            String pictureUrl = (String) payload.get("picture");
-            String locale = (String) payload.get("locale");
-            String familyName = (String) payload.get("family_name");
-            String givenName = (String) payload.get("given_name");
-
-            var user = User.builder()
-                    .firstname(givenName)
-                    .lastname(familyName)
-                    .email(email)
+            user = userExists.orElseGet(() -> User.builder()
+                    .firstname((String) payload.get("given_name"))
+                    .lastname((String) payload.get("family_name"))
+                    .email(payload.getEmail())
                     .oauthId(payload.getSubject())
                     .authType(AuthType.Google)
-                    .build();
+                    .build());
+
             var savedUser= userRepository.save(user);
             var jwtToken = jwtService.generateToken(user);
             var refreshToken = jwtService.generateRefreshToken(user);
@@ -110,6 +99,7 @@ public class AuthenticationServices {
             return AuthenticationResponse.builder()
                     .accessToken(jwtToken)
                     .refreshToken(refreshToken)
+                    .initialized(user.isInitialized())
                     .build();
         }
         else {
@@ -192,6 +182,7 @@ public class AuthenticationServices {
             return AuthenticationResponse.builder()
                     .accessToken(jwtToken)
                     .refreshToken(refreshToken)
+                    .initialized(user.isInitialized())
                     .build();
         }
 

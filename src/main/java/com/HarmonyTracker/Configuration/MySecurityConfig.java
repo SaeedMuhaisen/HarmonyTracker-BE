@@ -29,7 +29,9 @@ public class MySecurityConfig {
                 .requestMatchers(
                         "/api/public/**",//todo: this should be removed!!!!
                         "/api/register/**",//todo: this should be removed!!!!
-                        "/api/register"//todo: this should be removed!!!!
+                        "/api/register",
+                        "api/preview",
+                        "api/preview/**"
                 )
                 .permitAll()
                 .anyRequest()
