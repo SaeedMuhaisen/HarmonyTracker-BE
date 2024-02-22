@@ -5,6 +5,10 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 @Data
@@ -15,7 +19,7 @@ public class BodyDetails {
 
     public BodyDetails(BodyDetailsDTO bodyDetailsDTO) {
         this.genderType = bodyDetailsDTO.gender.equals("Male") ? GenderType.male : GenderType.female;
-        this.birthDate = new Date(bodyDetailsDTO.birthDate);
+        this.birthDate = Instant.ofEpochMilli(bodyDetailsDTO.birthDate).atZone(ZoneId.systemDefault()).toLocalDate();
 
         this.weight = bodyDetailsDTO.weightUnit.equals("kg") ?
                 (bodyDetailsDTO.weightI+ (double) bodyDetailsDTO.weightF/10):
@@ -54,7 +58,7 @@ public class BodyDetails {
     }
 
     private GenderType genderType;
-    private Date birthDate;
+    private LocalDate birthDate;
     private double weight;
     private double height;
     private ExtraData extraData;
