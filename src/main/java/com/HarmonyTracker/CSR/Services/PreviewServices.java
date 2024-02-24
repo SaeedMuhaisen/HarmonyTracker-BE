@@ -18,13 +18,12 @@ import java.util.Date;
 public class PreviewServices {
 
     public DemoMacro createMacroPlan(BodyDetails bodyDetails) {
-        var bmi=bodyDetails.getHeight() / (bodyDetails.getWeight()* bodyDetails.getWeight());
+        var bmi= bodyDetails.getWeight()/Math.pow(bodyDetails.getHeight()*0.01,2);
         var macros=DemoMacro.builder()
                 .bmr(10* bodyDetails.getWeight()+6.25* bodyDetails.getHeight()-5 * (Period.between(bodyDetails.getBirthDate(),LocalDate.now())).getYears())
                 .bmi(bmi)
                 .bmiClassificationType(BmiClassificationType.getType(bmi))
                 .build();
-
-        return null;
+        return macros;
     }
 }

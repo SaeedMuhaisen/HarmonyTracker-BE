@@ -5,25 +5,20 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Data
-@Getter
-@Setter
 public class BodyDetailsDTO {
     public String gender;
+    public double height;
+    public String preferredUnit;
+    public String preferredWeightUnit;
     public long birthDate;
-    public int weightI;
-    public int weightF;
-    public String weightUnit;
-    public int height;
-    public int heightI;
-    public int heightF;
-    public String heightUnit;
+    public double weight;
     public boolean extraData;
-    public Triplets waistNarrowest;
-    public Triplets waistNavel;
-    public Triplets hipWidest;
-    public Triplets thighWidest;
-    public Triplets neckNarrowest;
-    public Triplets bicepsWidest;
-    public Triplets forearmWidest;
-    public Triplets wristNarrowest;
+    public double waistNarrowest;
+    public double waistNavel;
+    public double hipWidest;
+    public double thighWidest;
+    public double neckNarrowest;
+    public double bicepsWidest;
+    public double forearmWidest;
+    public double wristNarrowest;
 }
