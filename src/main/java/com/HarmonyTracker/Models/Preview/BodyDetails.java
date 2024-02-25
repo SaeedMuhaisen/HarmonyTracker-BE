@@ -1,5 +1,6 @@
 package com.HarmonyTracker.Models.Preview;
 
+import com.HarmonyTracker.Entities.Enums.ActivityLevel;
 import com.HarmonyTracker.Entities.Enums.GenderType;
 import lombok.Data;
 import lombok.Getter;
@@ -16,9 +17,12 @@ import java.time.ZoneId;
 public class BodyDetails {
     public BodyDetails(BodyDetailsDTO bodyDetailsDTO) {
         this.genderType = bodyDetailsDTO.gender.equals("male") ? GenderType.male : GenderType.female;
-        this.birthDate = Instant.ofEpochMilli(bodyDetailsDTO.birthDate).atZone(ZoneId.systemDefault()).toLocalDate();
+        this.birthDate = Instant.ofEpochSecond(bodyDetailsDTO.birthDate).atZone(ZoneId.systemDefault()).toLocalDate();
+
         this.weight = bodyDetailsDTO.weight;
         this.height = bodyDetailsDTO.height;
+        this.activityLevel=ActivityLevel.getType(bodyDetailsDTO.activityLevel);
+
         if(bodyDetailsDTO.extraData){
             this.extraData=ExtraData.builder()
                     .waistNarrowest(bodyDetailsDTO.waistNarrowest)
@@ -31,12 +35,12 @@ public class BodyDetails {
                     .wristNarrowest(bodyDetailsDTO.wristNarrowest)
                     .build();
         }
-
     }
     private GenderType genderType;
     private LocalDate birthDate;
     private double weight;
     private double height;
     private ExtraData extraData;
+    private ActivityLevel activityLevel;
 
 }

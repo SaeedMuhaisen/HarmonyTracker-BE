@@ -7,7 +7,18 @@ public enum ActivityLevel {
     VERY_ACTIVE(1.725),
     SUPER_ACTIVE(1.9);
 
+    private final double value;
 
     ActivityLevel(double value) {
+        this.value = value;
+    }
+
+    public static ActivityLevel getType(double activityLevel) {
+        for (ActivityLevel type : ActivityLevel.values()) {
+            if (activityLevel == type.value) {
+                return type;
+            }
+        }
+        return null;
     }
 }

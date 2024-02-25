@@ -21,4 +21,5 @@ public class BodyDetailsDTO {
     public double bicepsWidest;
     public double forearmWidest;
     public double wristNarrowest;
+    public double activityLevel;
 }
