@@ -11,11 +11,22 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DemoMacro {
-    private double bmr;
-    private ActivityLevel activityLevel;
     private double bmi;
-    private BmiClassificationType bmiClassificationType;
     private double bodyFatPercentage;
+    private BmiClassificationType bmiClassificationType;
+
+    private double bmrMSJ;
+    private double bmrRHE;
+    private double bmrKMA;
+
+    private double tdeeRHE;
+    private double tdeeMSJ;
+    private double tdeeKMA;
+
     private double dietType;
-    private double tdee;
+
+    private Macros MacrosMSJ;
+    private Macros MacrosRHE;
+    private Macros MacrosKMA;
+
 }

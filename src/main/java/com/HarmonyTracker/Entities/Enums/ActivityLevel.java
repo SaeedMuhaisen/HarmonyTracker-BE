@@ -1,5 +1,8 @@
 package com.HarmonyTracker.Entities.Enums;
 
+import lombok.Getter;
+
+@Getter
 public enum ActivityLevel {
     SEDENTARY(1.2),
     LIGHTLY_ACTIVE(1.375),
