@@ -17,11 +17,10 @@ import java.time.ZoneId;
 public class BodyDetails {
     public BodyDetails(BodyDetailsDTO bodyDetailsDTO) {
         this.genderType = bodyDetailsDTO.gender.equals("male") ? GenderType.male : GenderType.female;
-        this.birthDate = Instant.ofEpochSecond(bodyDetailsDTO.birthDate).atZone(ZoneId.systemDefault()).toLocalDate();
+        this.birthDate = Instant.ofEpochMilli(bodyDetailsDTO.birthDate).atZone(ZoneId.systemDefault()).toLocalDate();
 
         this.weight = bodyDetailsDTO.weight;
         this.height = bodyDetailsDTO.height;
-        this.activityLevel=ActivityLevel.getType(bodyDetailsDTO.activityLevel);
 
         if(bodyDetailsDTO.extraData){
             this.extraData=ExtraData.builder()
@@ -41,6 +40,4 @@ public class BodyDetails {
     private double weight;
     private double height;
     private ExtraData extraData;
-    private ActivityLevel activityLevel;
-
 }

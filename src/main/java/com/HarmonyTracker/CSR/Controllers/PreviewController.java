@@ -3,6 +3,7 @@ package com.HarmonyTracker.CSR.Controllers;
 import com.HarmonyTracker.CSR.Services.PreviewServices;
 import com.HarmonyTracker.Models.Preview.BodyDetails;
 import com.HarmonyTracker.Models.Preview.BodyDetailsDTO;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

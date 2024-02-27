@@ -34,24 +34,29 @@ public class PreviewServices {
                         bodyDetails.getHeight(),
                         bodyDetails.getExtraData().getNeckNarrowest()));
             }
+            else{
+                macros.setBodyFatPercentage(calculatorUtil.MaleBodyFatPercentage(bmi,age));
+            }
         }
         else if(bodyDetails.getGenderType().equals(GenderType.female)) {
             macros.setBmrMSJ(10 * bodyDetails.getWeight() + 6.25 * bodyDetails.getHeight() - 5 * age - 161);
             macros.setBmrRHE(9.247 * bodyDetails.getWeight() + 3.098 * bodyDetails.getHeight() - 4.330 * age + 447.593);
-            macros.setBodyFatPercentage(calculatorUtil.FemaleBodyFatPercentage(
-                    bodyDetails.getExtraData().getWaistNavel(),
-                    bodyDetails.getHeight(),
-                    bodyDetails.getExtraData().getNeckNarrowest(),
-                    bodyDetails.getExtraData().getHipWidest()
-            ));
+            if (bodyDetails.getExtraData() != null) {
+                macros.setBodyFatPercentage(calculatorUtil.FemaleBodyFatPercentage(
+                        bodyDetails.getExtraData().getWaistNavel(),
+                        bodyDetails.getHeight(),
+                        bodyDetails.getExtraData().getNeckNarrowest(),
+                        bodyDetails.getExtraData().getHipWidest()
+                ));
+            }
+            else{
+                macros.setBodyFatPercentage(calculatorUtil.FemaleBodyFatPercentage(bmi,age));
+            }
+
         }
         macros.setBmrKMA(370+21.6*(1-macros.getBodyFatPercentage()/100)*bodyDetails.getWeight());
-
-        macros.setTdeeKMA(macros.getBmrKMA()*bodyDetails.getActivityLevel().getValue());
-        macros.setTdeeRHE(macros.getBmrRHE()*bodyDetails.getActivityLevel().getValue());
-        macros.setTdeeMSJ(macros.getBmrMSJ()*bodyDetails.getActivityLevel().getValue());
-
-
+        macros.setLeanBodyMass(bodyDetails.getWeight()-macros.getBodyFatPercentage()/100*bodyDetails.getWeight());
+        macros.setBodyFatMass(bodyDetails.getWeight()*macros.getBodyFatPercentage()/100);
         return macros;
     }
 }
