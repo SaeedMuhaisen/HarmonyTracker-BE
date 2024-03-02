@@ -1,6 +1,7 @@
 package com.HarmonyTracker.CSR.Services;
 
 import com.HarmonyTracker.Entities.Enums.BmiClassificationType;
+import com.HarmonyTracker.Entities.Enums.BodyFatMassClassificationType;
 import com.HarmonyTracker.Entities.Enums.GenderType;
 import com.HarmonyTracker.Models.Preview.BodyDetails;
 import com.HarmonyTracker.Models.Preview.DemoMacro;
@@ -57,6 +58,7 @@ public class PreviewServices {
         macros.setBmrKMA(370+21.6*(1-macros.getBodyFatPercentage()/100)*bodyDetails.getWeight());
         macros.setLeanBodyMass(bodyDetails.getWeight()-macros.getBodyFatPercentage()/100*bodyDetails.getWeight());
         macros.setBodyFatMass(bodyDetails.getWeight()*macros.getBodyFatPercentage()/100);
+        macros.setBodyFatMassClassificationType(BodyFatMassClassificationType.getType(macros.getBodyFatPercentage(),bodyDetails.getGenderType(),age));
         return macros;
     }
 }
