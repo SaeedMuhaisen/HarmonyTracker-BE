@@ -6,12 +6,13 @@ public enum BodyFatMassClassificationType {
     GOOD,
     FAIR,
     POOR,
-    DANGEROUSLY_HIGH,
+    HIGH,
 
 
 
     BodyFatMassClassificationType() {
     };
+    //todo: should we add less age than 20?
     //source https://www.medicalnewstoday.com/articles/body-fat-percentage-chart#women
     public static BodyFatMassClassificationType getType(double percentage,GenderType genderType,int age) {
         if(genderType.equals(GenderType.male)){
@@ -27,7 +28,7 @@ public enum BodyFatMassClassificationType {
                 } else if (percentage >= 18.7  && percentage < 23.2) {
                     return POOR;
                 } else if (percentage >= 23.2) {
-                    return DANGEROUSLY_HIGH;
+                    return HIGH;
                 }
             }else if(age>=30 && age<=39){
                 if (percentage < 8) {
@@ -41,7 +42,7 @@ public enum BodyFatMassClassificationType {
                 } else if (percentage >= 21.4   && percentage < 25) {
                     return POOR;
                 } else if (percentage >= 25) {
-                    return DANGEROUSLY_HIGH;
+                    return HIGH;
                 }
             }else if(age>=40 && age<=49){
                 if (percentage < 8) {
@@ -55,7 +56,7 @@ public enum BodyFatMassClassificationType {
                 } else if (percentage >= 23.5    && percentage < 26.7) {
                     return POOR;
                 } else if (percentage >= 26.7) {
-                    return DANGEROUSLY_HIGH;
+                    return HIGH;
                 }
             }else if(age>=50 && age<=59){
                 if (percentage < 8) {
@@ -69,7 +70,7 @@ public enum BodyFatMassClassificationType {
                 } else if (percentage >= 24.7 && percentage < 27.9) {
                     return POOR;
                 } else if (percentage >= 27.9) {
-                    return DANGEROUSLY_HIGH;
+                    return HIGH;
                 }
             }else if(age>=60 && age<=1000){
                 if (percentage < 8) {
@@ -83,7 +84,7 @@ public enum BodyFatMassClassificationType {
                 } else if (percentage >= 25.3  && percentage < 28.5) {
                     return POOR;
                 } else if (percentage >= 28.5) {
-                    return DANGEROUSLY_HIGH;
+                    return HIGH;
                 }
             }
         }else if(genderType.equals(GenderType.female)){
@@ -99,7 +100,7 @@ public enum BodyFatMassClassificationType {
                 } else if (percentage >= 22.8 && percentage < 27.2) {
                     return POOR;
                 } else if (percentage >= 27.2) {
-                    return DANGEROUSLY_HIGH;
+                    return HIGH;
                 }
             }else if(age>=30 && age<=39){
                 if (percentage < 14) {
@@ -113,7 +114,7 @@ public enum BodyFatMassClassificationType {
                 } else if (percentage >= 24.7  && percentage < 29.2) {
                     return POOR;
                 } else if (percentage >= 29.2) {
-                    return DANGEROUSLY_HIGH;
+                    return HIGH;
                 }
             }else if(age>=40 && age<=49){
                 if (percentage < 14) {
@@ -127,7 +128,7 @@ public enum BodyFatMassClassificationType {
                 } else if (percentage >= 27.7   && percentage < 31.9) {
                     return POOR;
                 } else if (percentage >= 31.9) {
-                    return DANGEROUSLY_HIGH;
+                    return HIGH;
                 }
             }else if(age>=50 && age<=59){
                 if (percentage < 14) {
@@ -141,7 +142,7 @@ public enum BodyFatMassClassificationType {
                 } else if (percentage >= 30.5    && percentage < 34.6) {
                     return POOR;
                 } else if (percentage >= 34.6) {
-                    return DANGEROUSLY_HIGH;
+                    return HIGH;
                 }
             }else if(age>=60 && age<=1000){
                 if (percentage < 14) {
@@ -155,7 +156,7 @@ public enum BodyFatMassClassificationType {
                 } else if (percentage >= 31.4 && percentage < 35.5) {
                     return POOR;
                 } else if (percentage >= 35.5) {
-                    return DANGEROUSLY_HIGH;
+                    return HIGH;
                 }
             }
         }

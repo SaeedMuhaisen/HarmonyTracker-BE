@@ -1,8 +1,6 @@
 package com.HarmonyTracker.Models.Preview;
 
-import com.HarmonyTracker.Entities.Enums.ActivityLevel;
-import com.HarmonyTracker.Entities.Enums.BmiClassificationType;
-import com.HarmonyTracker.Entities.Enums.BodyFatMassClassificationType;
+import com.HarmonyTracker.Entities.Enums.*;
 import lombok.*;
 
 @Data
@@ -13,12 +11,16 @@ import lombok.*;
 @AllArgsConstructor
 public class DemoMacro {
     private double bmi;
-    private double bodyFatPercentage;
     private BmiClassificationType bmiClassificationType;
+
+    private double bodyFatPercentage;
+    private BFPType bfpType; //this tells us based on what we calculated BodyFatPercentage
+
     private double bodyFatMass;
     private BodyFatMassClassificationType bodyFatMassClassificationType;
     private double leanBodyMass;
-    private double bmrMSJ;
-    private double bmrRHE;
-    private double bmrKMA;
+
+    private double bmr;
+    private BMRType bmrType;
+
 }
