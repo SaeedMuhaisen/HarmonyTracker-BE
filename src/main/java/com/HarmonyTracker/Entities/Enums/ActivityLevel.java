@@ -4,11 +4,14 @@ import lombok.Getter;
 
 @Getter
 public enum ActivityLevel {
-    SEDENTARY(1.2),
-    LIGHTLY_ACTIVE(1.375),
+    CONSTRICTED_LIFESTYLE(1.1),
+    WORKING_FROM_HOME(1.16),
+    Sedentary(1.2),
+    SLIGHTLY_ACTIVE(1.375),
+    LIGHTLY_ACTIVE(1.425),
     MODERATELY_ACTIVE(1.55),
     VERY_ACTIVE(1.725),
-    SUPER_ACTIVE(1.9);
+    EXTREMELY_ACTIVE(1.9);
 
     private final double value;
 
