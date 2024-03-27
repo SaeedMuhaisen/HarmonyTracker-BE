@@ -10,6 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DemoMacro {
+
     private double bmi;
     private BmiClassificationType bmiClassificationType;
 

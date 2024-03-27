@@ -2,7 +2,6 @@ package com.HarmonyTracker.Entities;
 
 
 import com.HarmonyTracker.Entities.Enums.AuthType;
-import com.HarmonyTracker.Entities.Enums.GenderType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -35,15 +34,13 @@ public class User implements UserDetails {
     private List<Token> tokens;
     private String password;
     @Enumerated(EnumType.STRING)
-    private GenderType genderType;
-    private Long birthDate;
-    private double weight;
-    private double height;
-    private boolean extraData;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id")
-    private UserExtraDetails userExtraDetails;
-    private boolean initialized=false;
+    private BodyDetails bodyDetails;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id")
+    private Macros macros;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

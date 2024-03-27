@@ -5,5 +5,5 @@ import org.springframework.stereotype.Component;
 
 
 public enum UnitType {
-    METRIC,IMPERIAL
+    cm,inch,kg,lb
 }

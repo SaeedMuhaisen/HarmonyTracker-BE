@@ -2,36 +2,34 @@ package com.HarmonyTracker.CSR.Services;
 
 import com.HarmonyTracker.CSR.Repositories.TokenRepository;
 import com.HarmonyTracker.CSR.Repositories.UserRepository;
+import com.HarmonyTracker.Entities.BodyDetails;
 import com.HarmonyTracker.Entities.Enums.AuthType;
 import com.HarmonyTracker.Entities.Enums.TokenType;
+import com.HarmonyTracker.Entities.Macros;
 import com.HarmonyTracker.Entities.Token;
 import com.HarmonyTracker.Entities.User;
+import com.HarmonyTracker.Mappers.BodyDetailsMapper;
 import com.HarmonyTracker.Models.Apple.AppleCredentialsToken;
 import com.HarmonyTracker.Models.Apple.IdTokenPayload;
 import com.HarmonyTracker.Models.Authentication.AuthenticationRequest;
 import com.HarmonyTracker.Models.Authentication.AuthenticationResponse;
 import com.HarmonyTracker.Models.Authentication.RegisterRequest;
-import com.HarmonyTracker.Models.Facebook.Data;
 import com.HarmonyTracker.Models.Facebook.FBAccessTokenJSON;
 import com.HarmonyTracker.Models.Facebook.FacebookUserModel;
 import com.HarmonyTracker.Models.Facebook.FacebookValidationModel;
+import DTO.BodyDetailsDTO;
 import com.HarmonyTracker.Utils.AppleLoginUtil;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import lombok.RequiredArgsConstructor;
-import org.apache.http.conn.ConnectTimeoutException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -99,7 +97,6 @@ public class AuthenticationServices {
             return AuthenticationResponse.builder()
                     .accessToken(jwtToken)
                     .refreshToken(refreshToken)
-                    .initialized(user.isInitialized())
                     .build();
         }
         else {
@@ -182,15 +179,17 @@ public class AuthenticationServices {
             return AuthenticationResponse.builder()
                     .accessToken(jwtToken)
                     .refreshToken(refreshToken)
-                    .initialized(user.isInitialized())
+
                     .build();
         }
 
     }
 
-    public AuthenticationResponse appleAuthentication(AppleCredentialsToken credentialsToken) throws AuthenticationException,InternalError {
+    public AuthenticationResponse appleAuthentication(AppleCredentialsToken credentialsToken, BodyDetailsDTO bodyDetailsDTO, Macros macros) throws AuthenticationException,InternalError {
         IdTokenPayload result;
-            try {
+        BodyDetails bodyDetails = BodyDetailsMapper.INSTANCE.toEntity(bodyDetailsDTO);
+
+        try {
                  result = appleLoginUtil.appleAuth(credentialsToken.getAuthorizationCode());
             }
             catch (Exception e){
@@ -217,6 +216,8 @@ public class AuthenticationServices {
                             .firstname(credentialsToken.getFullName().getGivenName())
                             .lastname(credentialsToken.getFullName().getFamilyName())
                             .email(result.getEmail())
+                            .bodyDetails(bodyDetails)
+                            .macros(macros)
                             .build();
                     user = userRepository.save(userToSave);
                 } else {

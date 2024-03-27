@@ -1,49 +1,23 @@
 package com.HarmonyTracker.CSR.Controllers;
 
-import com.HarmonyTracker.CSR.Repositories.TokenRepository;
-import com.HarmonyTracker.CSR.Repositories.UserRepository;
 import com.HarmonyTracker.CSR.Services.AuthenticationServices;
-import com.HarmonyTracker.CSR.Services.JwtService;
-import com.HarmonyTracker.CSR.Services.PreviewServices;
-import com.HarmonyTracker.Entities.Enums.AuthType;
-import com.HarmonyTracker.Entities.Enums.TokenType;
-import com.HarmonyTracker.Entities.Token;
-import com.HarmonyTracker.Entities.User;
+import com.HarmonyTracker.Entities.BodyDetails;
+import com.HarmonyTracker.Mappers.BodyDetailsMapper;
 import com.HarmonyTracker.Models.Apple.AppleCredentialsToken;
+import com.HarmonyTracker.Models.Apple.SignupWithAppleDTO;
 import com.HarmonyTracker.Models.Authentication.AuthenticationRequest;
 import com.HarmonyTracker.Models.Authentication.AuthenticationResponse;
 import com.HarmonyTracker.Models.Authentication.RegisterRequest;
 import com.HarmonyTracker.Models.Facebook.FBAccessTokenJSON;
-import com.HarmonyTracker.Models.Facebook.FacebookUserModel;
-import com.HarmonyTracker.Models.Facebook.FacebookValidationModel;
-import com.HarmonyTracker.Models.Preview.BodyDetails;
-import com.HarmonyTracker.Models.Preview.BodyDetailsDTO;
-import com.HarmonyTracker.Utils.AppleLoginUtil;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
 import lombok.RequiredArgsConstructor;
-import org.apache.http.conn.ConnectTimeoutException;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.naming.AuthenticationException;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.time.Instant;
-import java.util.Collections;
 import java.util.NoSuchElementException;
 
 @Controller
@@ -76,9 +50,9 @@ public class AuthenticationController {
         }
     }
     @PostMapping("/3")
-    public ResponseEntity<?> appleAuthentication(@RequestBody AppleCredentialsToken credentialsToken) {
+    public ResponseEntity<?> appleAuthentication(@RequestBody SignupWithAppleDTO signupWithAppleDTO) {
         try{
-            var response= authenticationServices.appleAuthentication(credentialsToken);
+            var response= authenticationServices.appleAuthentication(signupWithAppleDTO.getCredentialsToken(),signupWithAppleDTO.getBodyDetails(),signupWithAppleDTO.getMacros());
             return ResponseEntity.ok(response);
         }catch (AuthenticationException e){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

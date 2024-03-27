@@ -1,25 +1,26 @@
-package com.HarmonyTracker.Models.Preview;
+package DTO;
 
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 @Data
+@Getter
+@Setter
+
 public class BodyDetailsDTO {
     public String gender;
-    public double height;
+    public long birthDate;
     public String preferredUnit;
     public String preferredWeightUnit;
-    public long birthDate;
+
+    public double height;
     public double weight;
+
     public boolean extraData;
-    public double waistNarrowest;
+    public double neckNarrowest;
     public double waistNavel;
     public double hipWidest;
-    public double thighWidest;
-    public double neckNarrowest;
-    public double bicepsWidest;
-    public double forearmWidest;
-    public double wristNarrowest;
     public double activityLevel;
+    private int goal;
 }
