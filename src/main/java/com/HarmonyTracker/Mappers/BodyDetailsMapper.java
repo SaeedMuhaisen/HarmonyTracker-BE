@@ -7,6 +7,7 @@ import com.HarmonyTracker.Entities.Enums.GenderType;
 import com.HarmonyTracker.Entities.Enums.UnitType;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 import java.time.Instant;
@@ -18,24 +19,57 @@ public interface BodyDetailsMapper {
 
     BodyDetailsMapper INSTANCE = Mappers.getMapper(BodyDetailsMapper.class);
 
-    @Mapping(target = "genderType", source = "gender")
-    @Mapping(target = "preferredUnit", source = "preferredUnit")
-    @Mapping(target = "preferredWeightUnit", source = "preferredWeightUnit")
-    @Mapping(target = "activityLevel", source = "activityLevel")
+    @Mapping(target = "gender", source = "genderType", qualifiedByName = "mapGenderToString")
+    @Mapping(target = "preferredUnit", source = "preferredUnit", qualifiedByName = "mapUnitToString")
+    @Mapping(target = "preferredWeightUnit", source = "preferredWeightUnit", qualifiedByName = "mapUnitToString")
+    @Mapping(target = "activityLevel", source = "activityLevel", qualifiedByName = "mapActivityToDouble")
+    @Mapping(target = "birthDate", source = "birthDate", qualifiedByName = "mapLocalDateToLong")
+    BodyDetailsDTO toDTO(BodyDetails entity);
+
+    @Mapping(target = "genderType", source = "gender", qualifiedByName = "mapStringToGender")
+    @Mapping(target = "preferredUnit", source = "preferredUnit", qualifiedByName = "mapStringToUnit")
+    @Mapping(target = "preferredWeightUnit", source = "preferredWeightUnit", qualifiedByName = "mapStringToUnit")
+    @Mapping(target = "activityLevel", source = "activityLevel", qualifiedByName = "mapDoubleToActivity")
+    @Mapping(target = "birthDate", source = "birthDate", qualifiedByName = "mapLongToLocalDate")
     BodyDetails toEntity(BodyDetailsDTO dto);
 
-    default GenderType mapGender(String gender) {
-        return GenderType.valueOf(gender); // Assuming your GenderType enum has the same names as the gender strings
+    @Named("mapGenderToString")
+    default String mapGenderToString(GenderType genderType) {
+        return genderType != null ? genderType.name() : null;
     }
 
-    default UnitType mapUnit(String unit) {
-        return UnitType.valueOf(unit); // Assuming your UnitType enum has the same names as the unit strings
+    @Named("mapUnitToString")
+    default String mapUnitToString(UnitType unitType) {
+        return unitType != null ? unitType.name() : null;
     }
 
-    default ActivityLevel mapActivity(double activityLevel) {
+    @Named("mapActivityToDouble")
+    default double mapActivityToDouble(ActivityLevel activityLevel) {
+        return activityLevel != null ? activityLevel.getValue() : 0.0;
+    }
+
+    @Named("mapLocalDateToLong")
+    default long mapLocalDateToLong(LocalDate value) {
+        return value != null ? value.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() : 0L;
+    }
+
+    @Named("mapStringToGender")
+    default GenderType mapStringToGender(String gender) {
+        return GenderType.valueOf(gender);
+    }
+
+    @Named("mapStringToUnit")
+    default UnitType mapStringToUnit(String unit) {
+        return UnitType.valueOf(unit);
+    }
+
+    @Named("mapDoubleToActivity")
+    default ActivityLevel mapDoubleToActivity(double activityLevel) {
         return ActivityLevel.getType(activityLevel);
     }
-    default LocalDate map(long value) {
-        return Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).toLocalDate(); // Assuming your ActivityLevel enum has the same names as the activity strings
+
+    @Named("mapLongToLocalDate")
+    default LocalDate mapLongToLocalDate(long value) {
+        return Instant.ofEpochMilli(value).atZone(ZoneId.systemDefault()).toLocalDate();
     }
 }

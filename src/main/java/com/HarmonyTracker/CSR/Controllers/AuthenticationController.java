@@ -1,8 +1,6 @@
 package com.HarmonyTracker.CSR.Controllers;
 
 import com.HarmonyTracker.CSR.Services.AuthenticationServices;
-import com.HarmonyTracker.Entities.BodyDetails;
-import com.HarmonyTracker.Mappers.BodyDetailsMapper;
 import com.HarmonyTracker.Models.Apple.AppleCredentialsToken;
 import com.HarmonyTracker.Models.Apple.SignupWithAppleDTO;
 import com.HarmonyTracker.Models.Authentication.AuthenticationRequest;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.management.InstanceAlreadyExistsException;
 import javax.naming.AuthenticationException;
 import java.util.NoSuchElementException;
 
@@ -50,11 +49,29 @@ public class AuthenticationController {
         }
     }
     @PostMapping("/3")
-    public ResponseEntity<?> appleAuthentication(@RequestBody SignupWithAppleDTO signupWithAppleDTO) {
+    public ResponseEntity<?> appleAuthenticationSignUp(@RequestBody SignupWithAppleDTO signupWithAppleDTO) {
         try{
-            var response= authenticationServices.appleAuthentication(signupWithAppleDTO.getCredentialsToken(),signupWithAppleDTO.getBodyDetails(),signupWithAppleDTO.getMacros());
+            var response= authenticationServices.appleAuthenticationSignUp(
+                    signupWithAppleDTO.getCredentialsToken(),
+                    signupWithAppleDTO.getBodyDetails(),
+                    signupWithAppleDTO.getMacros());
             return ResponseEntity.ok(response);
         }catch (AuthenticationException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (InternalError e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }catch (InstanceAlreadyExistsException e){
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+    }
+    @PostMapping("/3Login")
+    public ResponseEntity<?> appleAuthenticationLogin(@RequestBody AppleCredentialsToken appleCredentialsToken) {
+        try {
+            var response = authenticationServices.appleAuthenticationLogin(appleCredentialsToken);
+            return ResponseEntity.ok(response);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (InternalError e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

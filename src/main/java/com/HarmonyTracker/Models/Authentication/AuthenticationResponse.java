@@ -1,5 +1,7 @@
 package com.HarmonyTracker.Models.Authentication;
 
+import DTO.BodyDetailsDTO;
+import com.HarmonyTracker.Entities.Macros;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,4 +18,6 @@ public class AuthenticationResponse {
     private String accessToken;
     @JsonProperty("refresh_token")
     private String refreshToken;
+    private BodyDetailsDTO bodyDetails;
+    private Macros macros;
 }

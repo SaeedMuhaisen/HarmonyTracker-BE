@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import javax.management.InstanceAlreadyExistsException;
 import javax.naming.AuthenticationException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -185,7 +186,7 @@ public class AuthenticationServices {
 
     }
 
-    public AuthenticationResponse appleAuthentication(AppleCredentialsToken credentialsToken, BodyDetailsDTO bodyDetailsDTO, Macros macros) throws AuthenticationException,InternalError {
+    public AuthenticationResponse appleAuthenticationSignUp(AppleCredentialsToken credentialsToken, BodyDetailsDTO bodyDetailsDTO, Macros macros) throws AuthenticationException, InternalError, InstanceAlreadyExistsException {
         IdTokenPayload result;
         BodyDetails bodyDetails = BodyDetailsMapper.INSTANCE.toEntity(bodyDetailsDTO);
 
@@ -195,7 +196,6 @@ public class AuthenticationServices {
             catch (Exception e){
                     throw new InternalError("internal Error in getAuthorizationCode() method - AppleAuthentication");
             }
-
             if(result!=null
                     && result.getIss().equals(appleIss)
                     && result.getAud().equals(appleClientId)
@@ -221,7 +221,7 @@ public class AuthenticationServices {
                             .build();
                     user = userRepository.save(userToSave);
                 } else {
-                    user = userExists.get();
+                    throw new InstanceAlreadyExistsException("User Already Exists");
                 }
 
                 var jwtToken = jwtService.generateToken(user);
@@ -231,6 +231,8 @@ public class AuthenticationServices {
                 return AuthenticationResponse.builder()
                         .accessToken(jwtToken)
                         .refreshToken(refreshToken)
+                        .bodyDetails(BodyDetailsMapper.INSTANCE.toDTO(user.getBodyDetails()))
+                        .macros(user.getMacros())
                         .build();
             }
             else{
@@ -285,5 +287,44 @@ public class AuthenticationServices {
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    public AuthenticationResponse appleAuthenticationLogin(AppleCredentialsToken appleCredentialsToken) throws AuthenticationException,NoSuchElementException {
+        IdTokenPayload result;
+
+        try {
+            result = appleLoginUtil.appleAuth(appleCredentialsToken.getAuthorizationCode());
+        } catch (Exception e) {
+            throw new InternalError("internal Error in getAuthorizationCode() method - AppleAuthentication");
+        }
+        if (result != null
+                && result.getIss().equals(appleIss)
+                && result.getAud().equals(appleClientId)
+                && result.getAuth_time() + 32000 > Instant.now().getEpochSecond()
+                && result.getExp() >= Instant.now().getEpochSecond()
+                && result.getEmail() != null
+        ) {
+            //check first do we have such user in our database?
+            User user;
+            var userExists = userRepository.findByOauthId(result.getSub());
+            if (!userExists.isPresent()) {
+                throw new NoSuchElementException("User Not Found");
+            } else {
+                user = userExists.get();
+            }
+
+            var jwtToken = jwtService.generateToken(user);
+            var refreshToken = jwtService.generateRefreshToken(user);
+            saveUserToken(user, jwtToken);
+
+            return AuthenticationResponse.builder()
+                    .accessToken(jwtToken)
+                    .refreshToken(refreshToken)
+                    .bodyDetails(BodyDetailsMapper.INSTANCE.toDTO(user.getBodyDetails()))
+                    .macros(user.getMacros())
+                    .build();
+        } else {
+            throw new AuthenticationException("result authentication is null");
+        }
     }
 }
